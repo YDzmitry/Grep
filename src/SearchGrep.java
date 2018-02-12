@@ -59,9 +59,11 @@ public final class SearchGrep {
                 tempStrings.clear();
             }
         }
-        System.out.println("\nСтроки, содержащие введенный аргумент");
-        for (String str : words)
-            System.out.println(str);
+        if (!words.isEmpty()) {
+            System.out.println("\nСтроки, содержащие введенный аргумент");
+            for (String str : words)
+                System.out.println(str);
+        }
     }
 
 
