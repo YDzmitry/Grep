@@ -12,57 +12,53 @@ public final class SearchGrep {
     private List<String> tempStrings = new ArrayList<>();
 
 
-    public void stringsSearch(String count) throws IOException {
+    public void stringsSearch(String argument) throws IOException {
 
-
-        Pattern pattern = null;
-        String argument;
+        String checkingString;
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         List<String> words = new ArrayList<>();
 
-        if (count.equals("1")) {
-
-            System.out.print("Введите аргументы через пробел: ");
-            argument = reader.readLine().toLowerCase().trim();
-            createListFromString(argument, arguments);
-
-        } else {
-            System.out.print("Введите аргумент(regex): ");
-            pattern = Pattern.compile(reader.readLine());
-        }
-
         System.out.println("Введите строки: ");
-
-        while (true) {
-            String originalString = reader.readLine();
-            createListFromString(originalString, tempStrings);
-
-            if (originalString.isEmpty())
-                break;
-
-            if (count.equals("1")) {
-
+        try {
+            if (argument.contains(" ")) {
+                throw new Exception();
+            }
+            Pattern pattern = Pattern.compile("(" + argument + ")");
+            while (true) {
+                checkingString = cleanString(reader.readLine());
+                createListFromString(checkingString, tempStrings);
+                if (checkingString.isEmpty()) {
+                    break;
+                }
+                for (int j = 0; j < tempStrings.size(); j++) {
+                    Matcher matcher = pattern.matcher(tempStrings.get(j));
+                    if (matcher.matches()) {
+                        words.add(checkingString);
+                        tempStrings.clear();
+                    }
+                }
+                tempStrings.clear();
+            }
+        } catch (Exception ex) {
+            createListFromString(argument, arguments);
+            while (true) {
+                checkingString = reader.readLine();
+                createListFromString(checkingString, tempStrings);
+                if (checkingString.isEmpty()) {
+                    break;
+                }
                 for (String arg : arguments) {
                     for (int j = 0; j < tempStrings.size(); j++) {
                         if (arg.equals(tempStrings.get(j))) {
-                            words.add(originalString);
+                            words.add(checkingString);
                             tempStrings.clear();
                         }
                     }
 
                 }
                 tempStrings.clear();
-
             }
-            if (pattern != null) {
-
-                Matcher matcher = pattern.matcher(originalString);
-
-                if (matcher.matches()) words.add(originalString);
-            }
-
         }
-
         System.out.println("\nСтроки, содержащие введенный аргумент");
         for (String str : words)
             System.out.println(str);
@@ -73,14 +69,14 @@ public final class SearchGrep {
         tempString = cleanString(tempString);
         for (int i = 0, j = 0; i < tempString.length(); i++) {
             if ((tempString.charAt(i) == ' ') || tempString.length() == i + 1) {
-                list.add(tempString.substring(j, i + 1));
+                list.add(tempString.substring(j, i + 1).trim());
                 j = i + 1;
             }
         }
     }
 
     private String cleanString(String tempString) {
-        tempString = tempString.replaceAll("\\W+", " ").replaceAll("\\s+", " ").trim();
+        tempString = tempString.replaceAll("(\\s+|[;])", " ").trim();
         return tempString;
     }
 }
